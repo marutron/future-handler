@@ -20,6 +20,7 @@ impl Executor {
     fn run(&self) {
         println!("run goes");
         while let Ok(task) = self.ready_queue.recv() {
+            println!("task accepted");
             let mut future_slot = task.future.lock().unwrap();
             if let Some(mut future) = future_slot.take() {
                 let waker = waker_ref(&task);

@@ -9,11 +9,6 @@ use std::{
 
 struct SharedState {
     completed: bool,
-
-    /// Waker для задачи, на которой работает TimerFuture.
-    /// Поток может использовать это после установки completed = true, чтобы
-    /// разбудить задачу TimerFuture, увидеть, что completed = true, и
-    /// продолжить выполнение.
     waker: Option<Waker>,
 }
 
@@ -27,8 +22,11 @@ impl Future for TimerFuture {
         // todo тут происходит клонирование `self.shared_state` или ссылка?
         let mut shared_state = self.shared_state.lock().unwrap();
         if shared_state.completed {
+            println!("ready");
             Poll::Ready(())
         } else {
+            println!("polled");
+            println!("{:?}", cx.waker());
             shared_state.waker = Some(cx.waker().clone());
             Poll::Pending
         }
